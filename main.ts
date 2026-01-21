@@ -1,14 +1,24 @@
 namespace SpriteKind {
     export const enemy2 = SpriteKind.create()
     export const enemy4 = SpriteKind.create()
+    export const DART = SpriteKind.create()
 }
 controller.player2.onButtonEvent(ControllerButton.B, ControllerButtonEvent.Pressed, function () {
     myDart = darts.create(img`
         b . . . . . 
         b 2 f 2 f 2 
         b . . . . . 
-        `, SpriteKind.Projectile, mySprite2.x, mySprite2.y)
-    myDart.throwDart()
+        `, SpriteKind.DART, mySprite2.x, mySprite2.y)
+    if (numdarts > 0) {
+        myDart.throwDart()
+        numdarts += -1
+        timer.background(function () {
+            pause(500)
+            _throw = true
+        })
+    } else {
+        game.splash("No darts")
+    }
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (full) {
@@ -112,6 +122,7 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             100,
             true
             )
+            controller.player2.moveSprite(mySprite2, 100, 0)
             mySprite2.startEffect(effects.spray)
             full = false
             eatplayer2 = false
@@ -295,6 +306,13 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
 function deewalk () {
 	
 }
+sprites.onOverlap(SpriteKind.enemy4, SpriteKind.DART, function (sprite, otherSprite) {
+    if (_throw) {
+        sprites.destroy(otherSprite)
+        _throw = false
+        numdarts += 1
+    }
+})
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (!(full)) {
         isbreathing = true
@@ -531,8 +549,10 @@ let projectile: Sprite = null
 let spit = false
 let eatplayer2 = false
 let full = false
+let _throw = false
 let myDart: Dart = null
 let mySprite: Sprite = null
+let numdarts = 0
 let isbreathing = false
 let bronto_burt: Sprite = null
 let dee: Sprite = null
@@ -897,6 +917,7 @@ for (let value52 of tiles.getTilesByType(assets.tile`myTile10`)) {
 }
 isbreathing = false
 let isbosslevel = false
+numdarts = 3
 mySprite = sprites.create(img`
     . . . . . . . . . . . . . . . . 
     . . . . . . . . . . . . . . . . 
